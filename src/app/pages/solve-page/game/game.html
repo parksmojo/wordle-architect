@@ -1,0 +1,4 @@
+@for (guess of guesses(); track $index) {
+  <app-guess-slot [guess]="guess" [length]="this.challenge().word.length" />
+}
+<app-keyboard />

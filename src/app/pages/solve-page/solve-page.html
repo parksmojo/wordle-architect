@@ -1,3 +1,6 @@
-<p>play-page works!</p>
-
-<p>{{ challenge?.word }}</p>
+@if (challenge) {
+  <app-game [challenge]="challenge" />
+} @else {
+  <p>Sorry this link wasn't created properly.</p>
+  <p>Please send it to parkersam&#64;gmail.com</p>
+}
