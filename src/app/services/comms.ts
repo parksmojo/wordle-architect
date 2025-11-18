@@ -24,10 +24,11 @@ export class Comms {
   }
 
   parseChallenge(route: ActivatedRoute): Challenge | null {
-    const encoded = route.snapshot.paramMap.get('encoded');
-    if (!encoded) return null;
-    const str = atob(decodeURIComponent(encoded));
     try {
+      const encoded = route.snapshot.paramMap.get('encoded');
+      if (!encoded) return null;
+
+      const str = atob(decodeURIComponent(encoded));
       return challengeSchema.parse(JSON.parse(str));
     } catch (error) {
       console.error(error);
