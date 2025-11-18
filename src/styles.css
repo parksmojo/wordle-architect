@@ -1,1 +1,27 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  background-color: #121213;
+  color: #f8f8f8;
+  font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: #121213;
+  color: inherit;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: inherit;
+}
+
+button {
+  font-family: inherit;
+}

@@ -1,4 +1,12 @@
-@for (guess of guesses(); track $index) {
-  <app-guess-slot [guess]="guess" [length]="this.challenge().word.length" />
-}
-<app-keyboard />
+<div class="game">
+  <div class="game-board">
+    @for (slot of guesses(); track $index) {
+      <app-guess-slot
+        [guess]="$index === guessNum() ? currentGuess().join('') : guesses()[$index]"
+        [length]="this.challenge().word.length"
+      />
+    }
+  </div>
+
+  <app-keyboard class="game-keyboard" [states]="letters()" />
+</div>

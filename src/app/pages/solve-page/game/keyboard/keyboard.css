@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 auto;
+  padding-bottom: 8px;
+  width: min(520px, 100%);
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.keyboard-row--offset {
+  padding: 0 24px;
+}
+
+.key {
+  align-items: center;
+  background-color: #818384;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  height: 58px;
+  justify-content: center;
+  min-width: 43px;
+  outline: none;
+  padding: 0 12px;
+  text-transform: uppercase;
+  transition: transform 0.07s ease, filter 0.07s ease;
+  user-select: none;
+}
+
+.key--wide {
+  min-width: 70px;
+}
+
+.key:active {
+  filter: brightness(0.9);
+  transform: scale(0.97);
+}

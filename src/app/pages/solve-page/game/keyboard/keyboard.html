@@ -1,1 +1,16 @@
-<p>{{ letters }}</p>
+<div class="keyboard">
+  @for (row of rows; track $index) {
+    <div class="keyboard-row" [class.keyboard-row--offset]="row.offset">
+      @for (key of row.keys; track key.id) {
+        <button
+          type="button"
+          class="key"
+          [class.key--wide]="key.size === 'wide'"
+          [style.backgroundColor]="backgroundFor(key)"
+        >
+          {{ key.label }}
+        </button>
+      }
+    </div>
+  }
+</div>

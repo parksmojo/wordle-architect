@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+.guess-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+
+.tile {
+  align-items: center;
+  background-color: #121213;
+  border: 2px solid #3a3a3c;
+  color: #f8f8f8;
+  display: inline-flex;
+  font-size: 2rem;
+  font-weight: 700;
+  height: 62px;
+  justify-content: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  width: 62px;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.tile--filled {
+  border-color: #565758;
+}
+
+.tile--absent {
+  background-color: #3a3a3c;
+  border-color: #3a3a3c;
+}
+
+.tile--present {
+  background-color: #b59f3b;
+  border-color: #b59f3b;
+}
+
+.tile--correct {
+  background-color: #538d4e;
+  border-color: #538d4e;
+}
+
+@media (max-width: 520px) {
+  .tile {
+    font-size: 1.5rem;
+    height: 52px;
+    width: 52px;
+  }
+}
