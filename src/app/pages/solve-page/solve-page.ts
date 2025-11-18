@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Challenge, challengeSchema } from '../../model/models';
+import { Comms } from '../../services/comms';
 
 @Component({
   selector: 'app-solve-page',
@@ -9,21 +9,7 @@ import { Challenge, challengeSchema } from '../../model/models';
   styleUrl: './solve-page.css',
 })
 export class SolvePage {
-  challenge: Challenge | null;
-
-  constructor(private route: ActivatedRoute) {
-    const encoded = this.route.snapshot.paramMap.get('encoded');
-    if (!encoded) {
-      this.challenge = null;
-      return;
-    }
-    const str = atob(decodeURIComponent(encoded));
-    try {
-      this.challenge = challengeSchema.parse(JSON.parse(str));
-    } catch (error) {
-      console.error(error);
-      this.challenge = null;
-      return;
-    }
-  }
+  private route = inject(ActivatedRoute);
+  private comms = inject(Comms);
+  challenge = this.comms.parseChallenge(this.route);
 }

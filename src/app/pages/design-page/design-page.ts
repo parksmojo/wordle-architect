@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Challenge } from '../../model/models';
+import { Comms } from '../../services/comms';
+import { debounced } from '../../utils/debounced';
 
 @Component({
   selector: 'app-design-page',
@@ -9,24 +10,23 @@ import { Challenge } from '../../model/models';
   styleUrl: './design-page.css',
 })
 export class DesignPage {
-  word = signal('');
+  private comms = inject(Comms);
 
-  share() {
-    const challenge: Challenge = {
-      word: this.word(),
-    };
+  wordInput = signal('');
+  word = debounced(this.wordInput);
+  guessLimit = signal('6');
+  allowNonsense = signal(false);
 
-    const challengeStr = JSON.stringify(challenge);
-    const encodedChallenge = encodeURIComponent(btoa(challengeStr));
-    const url = `${window.location.origin}/solve/${encodedChallenge}`;
-    console.log('Generated url:', url);
-
-    if (!navigator.share) {
-      console.log('Copying the text');
-      navigator.clipboard.writeText(url);
-    } else {
-      console.log('Sharing the text');
-      navigator.share({ url });
+  share = () => {
+    const guessLimit = parseInt(this.guessLimit());
+    if (!guessLimit) {
+      throw 'NaN';
     }
-  }
+
+    this.comms.shareChallenge({
+      word: this.word(),
+      guessLimit,
+      allowNonsense: this.allowNonsense(),
+    });
+  };
 }
