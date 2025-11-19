@@ -1,10 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Comms } from '../../services/comms';
+import { SiteHeader } from '../../components/site-header/site-header';
 
 @Component({
   selector: 'app-design-page',
-  imports: [FormsModule],
+  imports: [FormsModule, SiteHeader],
   templateUrl: './design-page.html',
   styleUrl: './design-page.css',
 })

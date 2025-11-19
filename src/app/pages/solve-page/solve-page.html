@@ -1,6 +1,10 @@
-@if (challenge) {
-  <app-game [challenge]="challenge" />
-} @else {
-  <p>Sorry this link wasn't created properly.</p>
-  <p>Please send it to parkersam&#64;gmail.com</p>
-}
+<div class="solve">
+  <app-site-header [showCreateButton]="true" />
+
+  @if (challenge) {
+    <app-game [challenge]="challenge" />
+  } @else {
+    <p>Sorry this link wasn't created properly.</p>
+    <p>Please send it to parkersam&#64;gmail.com</p>
+  }
+</div>
