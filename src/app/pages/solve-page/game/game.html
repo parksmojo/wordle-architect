@@ -1,11 +1,13 @@
 <div class="game">
-  <div class="game-board">
-    @for (slot of guesses(); track $index) {
-      <app-guess-slot
-        [guess]="$index === guessNum() ? currentGuess().join('') : guesses()[$index]"
-        [length]="this.challenge().word.length"
-      />
-    }
+  <div class="game-board-container">
+    <div class="game-board">
+      @for (slot of guesses(); track $index) {
+        <app-guess-slot
+          [guess]="$index === guessNum() ? currentGuess().join('') : guesses()[$index]"
+          [length]="this.challenge().word.length"
+        />
+      }
+    </div>
   </div>
 
   @if (won() !== null) {

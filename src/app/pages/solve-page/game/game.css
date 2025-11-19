@@ -1,4 +1,5 @@
 :host {
+  align-items: stretch;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -9,18 +10,30 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  height: 100vh;
+  height: 100dvh;
   margin: 0 auto;
+  overflow: hidden;
   padding: 32px 0 48px;
   width: min(540px, 100%);
+}
+
+.game-board-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
 }
 
 .game-board {
   display: grid;
   gap: 12px;
   width: 100%;
+  align-content: flex-start;
 }
 
 .game-keyboard {
+  margin-top: auto;
   width: 100%;
 }
 
