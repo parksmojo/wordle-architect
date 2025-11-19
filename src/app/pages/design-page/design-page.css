@@ -108,12 +108,23 @@
   gap: 8px;
 }
 
+.field__header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .field__label {
   color: #d7dadc;
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.field__status {
+  margin-left: auto;
 }
 
 .field__input {
@@ -136,6 +147,60 @@
 .field__hint {
   color: #8d8f94;
   font-size: 0.85rem;
+}
+
+.validation-status {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: 600;
+  gap: 8px;
+  margin: 0;
+}
+
+.validation-status__dot {
+  background-color: currentColor;
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+}
+
+.validation-status--valid {
+  color: #6aaa64;
+}
+
+.validation-status--invalid {
+  color: #d26755;
+}
+
+.validation-status--loading {
+  color: #d4aa3a;
+}
+
+.validation-status--bypassed {
+  color: #8d8f94;
+}
+
+.validation-status--loading .validation-status__dot {
+  animation: validationPulse 1s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+@keyframes validationPulse {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.75);
+    opacity: 0.5;
+  }
 }
 
 .toggle {

@@ -2,6 +2,7 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
   input,
   linkedSignal,
@@ -11,6 +12,8 @@ import { Challenge, Color } from '../../../schema/schema';
 import { Keyboard } from './keyboard/keyboard';
 import { GuessSlot } from './guess-slot/guess-slot';
 import { Comms } from '../../../services/comms';
+
+type GuessValidationState = 'idle' | 'loading' | 'valid' | 'invalid';
 
 @Component({
   selector: 'app-game',
@@ -30,6 +33,52 @@ export class Game {
   letters = signal<Record<string, Color>>({});
 
   won = signal<boolean | null>(null);
+  guessValidationState = signal<GuessValidationState>('idle');
+  invalidGuessAttempted = signal(false);
+  autoSubmitPending = signal(false);
+
+  private validationRequestId = 0;
+
+  constructor() {
+    effect(() => {
+      const challenge = this.challenge();
+      const allowNonsense = !!challenge.allowNonsense;
+      const targetLength = challenge.word.length;
+      const guess = this.currentGuess().join('').toLowerCase();
+
+      if (allowNonsense || guess.length !== targetLength) {
+        this.validationRequestId++;
+        this.guessValidationState.set('idle');
+        return;
+      }
+
+      const currentRequestId = ++this.validationRequestId;
+      this.guessValidationState.set('loading');
+
+      this.comms.validateWord(guess).then((isValid) => {
+        if (currentRequestId !== this.validationRequestId) {
+          return;
+        }
+
+        this.guessValidationState.set(isValid ? 'valid' : 'invalid');
+      });
+    });
+
+    effect(() => {
+      const state = this.guessValidationState();
+
+      if (state === 'valid') {
+        this.invalidGuessAttempted.set(false);
+
+        if (this.autoSubmitPending()) {
+          this.autoSubmitPending.set(false);
+          this.completeGuessSubmission();
+        }
+      } else if (state === 'invalid') {
+        this.autoSubmitPending.set(false);
+      }
+    });
+  }
 
   addLetter(letter: string) {
     if (this.won() !== null) {
@@ -39,6 +88,8 @@ export class Game {
 
     if (this.currentGuess().length < this.challenge().word.length) {
       this.currentGuess.update((curr) => [...curr, letter]);
+      this.invalidGuessAttempted.set(false);
+      this.autoSubmitPending.set(false);
     }
   }
 
@@ -50,6 +101,8 @@ export class Game {
       curr.pop();
       return [...curr];
     });
+    this.invalidGuessAttempted.set(false);
+    this.autoSubmitPending.set(false);
   }
 
   submitGuess() {
@@ -61,30 +114,25 @@ export class Game {
       return;
     }
 
-    const colors = this.compare(this.challenge().word, this.currentGuess());
+    if (!this.challenge().allowNonsense) {
+      const validationState = this.guessValidationState();
 
-    this.guesses.update((prev) => {
-      prev[this.guessNum()] = [this.currentGuess().join(''), colors.join('')];
-      return [...prev];
-    });
+      if (validationState === 'invalid') {
+        this.invalidGuessAttempted.set(true);
+        this.autoSubmitPending.set(false);
+        return;
+      }
 
-    const letters = this.letters();
-    for (const [i, color] of colors.entries()) {
-      const letter = this.currentGuess()[i];
-      if (!letters[letter] || color === 'g' || (letters[letter] === 'b' && color === 'y')) {
-        letters[letter] = color;
+      if (validationState !== 'valid') {
+        this.invalidGuessAttempted.set(true);
+        this.autoSubmitPending.set(true);
+        return;
       }
     }
-    this.letters.set(letters);
 
-    this.currentGuess.set([]);
-    this.guessNum.update((prev) => prev + 1);
-
-    if (colors.every((color) => color === 'g')) {
-      this.won.set(true);
-    } else if (this.guessNum() >= this.challenge().guessLimit) {
-      this.won.set(false);
-    }
+    this.invalidGuessAttempted.set(false);
+    this.autoSubmitPending.set(false);
+    this.completeGuessSubmission();
   }
 
   compare(answer: string, guess: string[]) {
@@ -114,5 +162,32 @@ export class Game {
       .filter((val) => Array.isArray(val))
       .map(([_, colors]) => colors);
     this.comms.shareResult(!!this.won(), guessResults);
+  }
+
+  private completeGuessSubmission() {
+    const colors = this.compare(this.challenge().word, this.currentGuess());
+
+    this.guesses.update((prev) => {
+      prev[this.guessNum()] = [this.currentGuess().join(''), colors.join('')];
+      return [...prev];
+    });
+
+    const letters = this.letters();
+    for (const [i, color] of colors.entries()) {
+      const letter = this.currentGuess()[i];
+      if (!letters[letter] || color === 'g' || (letters[letter] === 'b' && color === 'y')) {
+        letters[letter] = color;
+      }
+    }
+    this.letters.set(letters);
+
+    this.currentGuess.set([]);
+    this.guessNum.update((prev) => prev + 1);
+
+    if (colors.every((color) => color === 'g')) {
+      this.won.set(true);
+    } else if (this.guessNum() >= this.challenge().guessLimit) {
+      this.won.set(false);
+    }
   }
 }

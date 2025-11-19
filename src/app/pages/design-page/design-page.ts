@@ -1,7 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Comms } from '../../services/comms';
 import { SiteHeader } from '../../components/site-header/site-header';
+import { debounced } from '../../utils/debounced';
+
+type ValidationState = 'idle' | 'loading' | 'valid' | 'invalid';
 
 @Component({
   selector: 'app-design-page',
@@ -21,6 +24,42 @@ export class DesignPage {
   guessLimit = signal('6');
   allowNonsense = signal(false);
 
+  wordDebounced = debounced(this.wordInput);
+
+  wordValidationState = signal<ValidationState>('idle');
+
+  private validationRequestId = 0;
+
+  constructor() {
+    effect(() => {
+      const word = this.wordDebounced().trim();
+      const allowNonsense = this.allowNonsense();
+
+      if (allowNonsense) {
+        this.validationRequestId++;
+        this.wordValidationState.set('valid');
+        return;
+      }
+
+      if (word.length < this.MIN_WORD_LENGTH) {
+        this.validationRequestId++;
+        this.wordValidationState.set('idle');
+        return;
+      }
+
+      const currentRequest = ++this.validationRequestId;
+      this.wordValidationState.set('loading');
+
+      this.comms.validateWord(word.toLowerCase()).then((isValid) => {
+        if (currentRequest !== this.validationRequestId) {
+          return;
+        }
+
+        this.wordValidationState.set(isValid ? 'valid' : 'invalid');
+      });
+    });
+  }
+
   shareDisabled = computed(() => {
     const trimmedWordLength = this.wordInput().trim().length;
     const guessLimit = parseInt(this.guessLimit(), 10);
@@ -37,6 +76,10 @@ export class DesignPage {
       return true;
     }
 
+    if (!this.allowNonsense() && this.wordValidationState() !== 'valid') {
+      return true;
+    }
+
     return false;
   });
 
@@ -49,7 +92,14 @@ export class DesignPage {
       .replace(/[^a-zA-Z]/g, '')
       .toUpperCase()
       .slice(0, this.MAX_WORD_LENGTH);
+
+    if (sanitized === this.wordInput()) {
+      return;
+    }
+
+    this.validationRequestId++;
     this.wordInput.set(sanitized);
+    this.wordValidationState.set('idle');
   }
 
   get guessLimitModel() {
@@ -83,7 +133,7 @@ export class DesignPage {
 
   share = () => {
     const guessLimit = parseInt(this.guessLimit(), 10);
-    const secretWord = this.wordInput().trim();
+    const secretWord = this.wordInput().trim().toLowerCase();
 
     if (
       !secretWord ||
@@ -98,6 +148,10 @@ export class DesignPage {
       guessLimit < this.MIN_GUESS_LIMIT ||
       guessLimit > this.MAX_GUESS_LIMIT
     ) {
+      return;
+    }
+
+    if (!this.allowNonsense() && this.wordValidationState() !== 'valid') {
       return;
     }
 

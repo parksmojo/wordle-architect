@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Challenge, challengeSchema, Color } from '../schema/schema';
 import { ActivatedRoute } from '@angular/router';
 
@@ -68,13 +68,17 @@ export class Comms {
     this.share(msg.join(''));
   }
 
-  async checkWord(word: string) {
+  validationIsLoading = signal(false);
+  async validateWord(word: string) {
+    this.validationIsLoading.set(true);
     try {
       const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
       return res.status === 200;
     } catch (err) {
       console.error(err);
       return true;
+    } finally {
+      this.validationIsLoading.set(false);
     }
   }
 }

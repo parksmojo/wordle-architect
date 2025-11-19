@@ -12,7 +12,38 @@
 
     <form class="design-form" (ngSubmit)="share()" novalidate>
       <label class="field">
-        <span class="field__label">Secret word</span>
+        @let validationState = wordValidationState();
+        @let allowNonsenseEnabled = allowNonsense();
+        <div class="field__header">
+          <span class="field__label">Secret word</span>
+          @if (allowNonsenseEnabled) {
+            <p class="validation-status validation-status--bypassed field__status" aria-live="polite">
+              <span class="validation-status__dot" aria-hidden="true"></span>
+              <span>Non-dictionary words allowed</span>
+            </p>
+          } @else if (validationState !== 'idle') {
+            <p
+              class="validation-status field__status"
+              [class.validation-status--valid]="validationState === 'valid'"
+              [class.validation-status--invalid]="validationState === 'invalid'"
+              [class.validation-status--loading]="validationState === 'loading'"
+              aria-live="polite"
+            >
+              <span class="validation-status__dot" aria-hidden="true"></span>
+              @switch (validationState) {
+                @case ('loading') {
+                  <span>Checking the dictionary...</span>
+                }
+                @case ('valid') {
+                  <span>Looks like a real word!</span>
+                }
+                @case ('invalid') {
+                  <span>We can't find that in the dictionary.</span>
+                }
+              }
+            </p>
+          }
+        </div>
         <input
           class="field__input"
           type="text"

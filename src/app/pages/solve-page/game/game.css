@@ -32,6 +32,25 @@
   align-content: flex-start;
 }
 
+.game__validation {
+  background-color: #1a1a1b;
+  border: 1px solid #3a3a3c;
+  border-radius: 12px;
+  color: #d26755;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  margin: -4px auto 0;
+  max-width: 420px;
+  padding: 12px 18px;
+  text-align: center;
+  width: 100%;
+}
+
+.game__validation--loading {
+  color: #d4aa3a;
+}
+
 .game-keyboard {
   margin-top: auto;
   width: 100%;

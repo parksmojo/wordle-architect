@@ -10,6 +10,20 @@
     </div>
   </div>
 
+  @if (won() === null && !this.challenge().allowNonsense && invalidGuessAttempted()) {
+    <p
+      class="game__validation"
+      [class.game__validation--loading]="guessValidationState() === 'loading'"
+      aria-live="assertive"
+    >
+      @if (guessValidationState() === 'invalid') {
+        <span>That word isn't in the dictionary for this challenge.</span>
+      } @else {
+        <span>Validating word...</span>
+      }
+    </p>
+  }
+
   @if (won() !== null) {
     <section class="game-summary" aria-live="polite">
       <header class="game-summary__status">
@@ -31,7 +45,7 @@
         </p>
       }
 
-      <p class="game-summary__cta">Show the architect how you did!</p>
+      <p class="game-summary__cta">Show off how you did!</p>
       <button type="button" class="game-summary__share" (click)="share()">Share</button>
     </section>
   } @else {
