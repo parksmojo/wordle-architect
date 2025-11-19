@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, HostListener, input, output } from '@angular/core';
 import { Color, colorToHex } from '../../../../schema/schema';
 
 type KeyKind = 'letter' | 'enter' | 'delete';
@@ -45,6 +45,39 @@ export class Keyboard {
       this.delete.emit();
     } else {
       this.keypress.emit(keyId);
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeydown(event: KeyboardEvent) {
+    // Ignore typing inside form fields or editable regions.
+    const target = event.target as HTMLElement | null;
+    if (
+      target &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        (target as HTMLElement).isContentEditable)
+    ) {
+      return;
+    }
+
+    const key = event.key;
+
+    if (key === 'Enter') {
+      event.preventDefault();
+      this.submit.emit();
+      return;
+    }
+
+    if (key === 'Backspace' || key === 'Delete') {
+      event.preventDefault();
+      this.delete.emit();
+      return;
+    }
+
+    if (/^[a-zA-Z]$/.test(key)) {
+      event.preventDefault();
+      this.keypress.emit(key.toLowerCase());
     }
   }
 }

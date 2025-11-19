@@ -8,11 +8,37 @@
     }
   </div>
 
-  <app-keyboard
-    class="game-keyboard"
-    [states]="letters()"
-    (keypress)="addLetter($event)"
-    (delete)="deleteLetter()"
-    (submit)="submitGuess()"
-  />
+  @if (won() !== null) {
+    <section class="game-summary" aria-live="polite">
+      <header class="game-summary__status">
+        <span class="game-summary__label">Result</span>
+        <span class="game-summary__score">{{ guessNum() }}/{{ this.challenge().guessLimit }}</span>
+      </header>
+
+      <p class="game-summary__badge" [class.game-summary__badge--lost]="won() === false">
+        {{ won() ? 'Victory' : 'Out of guesses' }}
+      </p>
+
+      <p class="game-summary__message">
+        {{ won() ? 'Congrats! You solved the challenge.' : 'Too bad! Try again next time.' }}
+      </p>
+
+      @if (!won()) {
+        <p class="game-summary__answer">
+          Answer: <span>{{ this.challenge().word.toUpperCase() }}</span>
+        </p>
+      }
+
+      <p class="game-summary__cta">Show the architect how you did!</p>
+      <button type="button" class="game-summary__share" (click)="share()">Share</button>
+    </section>
+  } @else {
+    <app-keyboard
+      class="game-keyboard"
+      [states]="letters()"
+      (keypress)="addLetter($event)"
+      (delete)="deleteLetter()"
+      (submit)="submitGuess()"
+    />
+  }
 </div>

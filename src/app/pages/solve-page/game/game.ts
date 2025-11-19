@@ -1,7 +1,16 @@
-import { Component, computed, input, linkedSignal, signal } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+} from '@angular/core';
 import { Challenge, Color } from '../../../schema/schema';
 import { Keyboard } from './keyboard/keyboard';
 import { GuessSlot } from './guess-slot/guess-slot';
+import { Comms } from '../../../services/comms';
 
 @Component({
   selector: 'app-game',
@@ -10,6 +19,8 @@ import { GuessSlot } from './guess-slot/guess-slot';
   styleUrl: './game.css',
 })
 export class Game {
+  private comms = inject(Comms);
+
   challenge = input.required<Challenge>();
   guesses = linkedSignal<([string, string] | string | undefined)[]>(() =>
     Array(this.challenge().guessLimit ?? 6),
@@ -18,7 +29,12 @@ export class Game {
   currentGuess = signal<string[]>([]);
   letters = signal<Record<string, Color>>({});
 
+  won = signal<boolean | null>(null);
+
   addLetter(letter: string) {
+    if (this.won() !== null) {
+      return;
+    }
     letter = letter[0];
 
     if (this.currentGuess().length < this.challenge().word.length) {
@@ -27,6 +43,9 @@ export class Game {
   }
 
   deleteLetter() {
+    if (this.won() !== null) {
+      return;
+    }
     this.currentGuess.update((curr) => {
       curr.pop();
       return [...curr];
@@ -34,6 +53,10 @@ export class Game {
   }
 
   submitGuess() {
+    if (this.won() !== null) {
+      return;
+    }
+
     if (this.currentGuess().length < this.challenge().word.length) {
       return;
     }
@@ -44,21 +67,24 @@ export class Game {
       prev[this.guessNum()] = [this.currentGuess().join(''), colors.join('')];
       return [...prev];
     });
-    this.guessNum.update((prev) => prev + 1);
 
+    const letters = this.letters();
     for (const [i, color] of colors.entries()) {
       const letter = this.currentGuess()[i];
-      const prev = this.letters()[letter];
-
-      if (!prev || (prev === 'y' && color === 'g')) {
-        this.letters.update((obj) => ({
-          ...obj,
-          [letter]: color,
-        }));
+      if (!letters[letter] || color === 'g' || (letters[letter] === 'b' && color === 'y')) {
+        letters[letter] = color;
       }
     }
+    this.letters.set(letters);
 
     this.currentGuess.set([]);
+    this.guessNum.update((prev) => prev + 1);
+
+    if (colors.every((color) => color === 'g')) {
+      this.won.set(true);
+    } else if (this.guessNum() >= this.challenge().guessLimit) {
+      this.won.set(false);
+    }
   }
 
   compare(answer: string, guess: string[]) {
@@ -81,5 +107,12 @@ export class Game {
       }
     }
     return colors;
+  }
+
+  share() {
+    const guessResults = this.guesses()
+      .filter((val) => Array.isArray(val))
+      .map(([_, colors]) => colors);
+    this.comms.shareResult(!!this.won(), guessResults);
   }
 }

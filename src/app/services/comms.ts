@@ -1,11 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Challenge, challengeSchema } from '../schema/schema';
+import { Challenge, challengeSchema, Color } from '../schema/schema';
 import { ActivatedRoute } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Comms {
+  private share(text: string, isUrl?: boolean) {
+    if (!navigator.share) {
+      console.log('Copying the text');
+      navigator.clipboard.writeText(text);
+    } else {
+      console.log('Sharing the text');
+      const opts = isUrl ? { url: text } : { text };
+      navigator.share(opts);
+    }
+  }
+
   shareChallenge(challenge: Challenge) {
     if (!challenge.allowNonsense) delete challenge.allowNonsense;
 
@@ -14,13 +25,7 @@ export class Comms {
     const url = `${window.location.origin}/solve/${encodedChallenge}`;
     console.log('Generated url:', url);
 
-    if (!navigator.share) {
-      console.log('Copying the text');
-      navigator.clipboard.writeText(url);
-    } else {
-      console.log('Sharing the text');
-      navigator.share({ url });
-    }
+    this.share(url, true);
   }
 
   parseChallenge(route: ActivatedRoute): Challenge | null {
@@ -34,5 +39,32 @@ export class Comms {
       console.error(error);
       return null;
     }
+  }
+
+  shareResult(won: boolean, result: string[]) {
+    const msg = [];
+    if (!won) {
+      msg.push('You got me...');
+    } else if (result.length <= 2) {
+      msg.push('Too easy!');
+    } else {
+      msg.push('I got it!');
+    }
+    msg.push('\n');
+
+    for (const row of result) {
+      for (const letter of row) {
+        if (letter === 'g') {
+          msg.push('🟩');
+        } else if (letter === 'y') {
+          msg.push('🟨');
+        } else {
+          msg.push('⬛');
+        }
+      }
+      msg.push('\n');
+    }
+
+    this.share(msg.join(''));
   }
 }

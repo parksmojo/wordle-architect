@@ -1,11 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Comms } from '../../services/comms';
-import { GuessSlot } from '../solve-page/game/guess-slot/guess-slot';
 
 @Component({
   selector: 'app-design-page',
-  imports: [FormsModule, GuessSlot],
+  imports: [FormsModule],
   templateUrl: './design-page.html',
   styleUrl: './design-page.css',
 })
