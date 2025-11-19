@@ -67,4 +67,14 @@ export class Comms {
 
     this.share(msg.join(''));
   }
+
+  async checkWord(word: string) {
+    try {
+      const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+      return res.status === 200;
+    } catch (err) {
+      console.error(err);
+      return true;
+    }
+  }
 }

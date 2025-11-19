@@ -3,7 +3,6 @@
 <div class="design">
   <section class="design__panel">
     <header class="design__header">
-      <p class="design__eyebrow">Wordle Architect</p>
       <h1>Create a shareable puzzle</h1>
       <p>
         Pick any secret word and decide how many guesses your friends get. When you're ready, share
@@ -17,40 +16,53 @@
         <input
           class="field__input"
           type="text"
-          maxlength="16"
-          placeholder="E.g. MAVEN"
+          minlength="3"
+          maxlength="9"
+          pattern="[A-Za-z]*"
+          [placeholder]="placeholder"
           autocomplete="off"
           autocapitalize="characters"
+          inputmode="text"
           spellcheck="false"
           [(ngModel)]="wordInputModel"
           name="word"
           required
         />
-        <span class="field__hint">Letters only, we'll uppercase it for you.</span>
+        <span class="field__hint">3-9 letters only, we'll uppercase it for you.</span>
       </label>
 
-      <label class="field">
-        <span class="field__label">Guess limit</span>
-        <input
-          class="field__input"
-          type="number"
-          min="1"
-          max="12"
-          [(ngModel)]="guessLimitModel"
-          name="guessLimit"
-          required
-        />
-        <span class="field__hint">Default Wordle rules use 6 guesses.</span>
-      </label>
+      <details class="advanced-settings">
+        <summary class="advanced-settings__summary">
+          <span>Advanced settings</span>
+          <span class="advanced-settings__caret" aria-hidden="true"></span>
+        </summary>
 
-      <label class="toggle">
-        <input type="checkbox" [(ngModel)]="allowNonsenseModel" name="allowNonsense" />
-        <span class="toggle__indicator"></span>
-        <div>
-          <span class="toggle__label">Allow non-dictionary words</span>
-          <p class="toggle__hint">Helpful for inside jokes or code words.</p>
+        <div class="advanced-settings__content">
+          <label class="field">
+            <span class="field__label">Guess limit</span>
+            <input
+              class="field__input"
+              type="number"
+              min="2"
+              max="20"
+              inputmode="numeric"
+              [(ngModel)]="guessLimitModel"
+              name="guessLimit"
+              required
+            />
+            <span class="field__hint">Choose between 2 and 20 guesses.</span>
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" [(ngModel)]="allowNonsenseModel" name="allowNonsense" />
+            <span class="toggle__indicator"></span>
+            <div>
+              <span class="toggle__label">Allow non-dictionary guesses</span>
+              <p class="toggle__hint">Helpful for inside jokes or code words.</p>
+            </div>
+          </label>
         </div>
-      </label>
+      </details>
 
       <button class="share-button" type="submit" [disabled]="shareDisabled()">
         Share challenge
