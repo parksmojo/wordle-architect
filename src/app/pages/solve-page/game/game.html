@@ -8,5 +8,11 @@
     }
   </div>
 
-  <app-keyboard class="game-keyboard" [states]="letters()" />
+  <app-keyboard
+    class="game-keyboard"
+    [states]="letters()"
+    (keypress)="addLetter($event)"
+    (delete)="deleteLetter()"
+    (submit)="submitGuess()"
+  />
 </div>

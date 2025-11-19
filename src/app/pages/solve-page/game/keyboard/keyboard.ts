@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Color, colorToHex } from '../../../../schema/schema';
 
 type KeyKind = 'letter' | 'enter' | 'delete';
@@ -25,6 +25,9 @@ interface KeyboardRow {
 export class Keyboard {
   protected readonly rows = KEYBOARD_ROWS;
   states = input.required<Record<string, Color>>();
+  keypress = output<string>();
+  submit = output();
+  delete = output();
 
   protected backgroundFor(key: KeyConfig) {
     if (key.kind !== 'letter') {
@@ -33,6 +36,16 @@ export class Keyboard {
 
     const state = this.states()[key.id];
     return colorToHex(state);
+  }
+
+  handleKeypress(keyId: string) {
+    if (keyId === 'enter') {
+      this.submit.emit();
+    } else if (keyId === 'delete') {
+      this.delete.emit();
+    } else {
+      this.keypress.emit(keyId);
+    }
   }
 }
 
@@ -54,10 +67,6 @@ const KEYBOARD_ROWS: KeyboardRow[] = [
   { keys: letterRow('qwertyuiop') },
   { keys: letterRow('asdfghjkl'), offset: true },
   {
-    keys: [
-      actionKey('enter', 'ENTER'),
-      ...letterRow('zxcvbnm'),
-      actionKey('delete', 'DEL'),
-    ],
+    keys: [actionKey('enter', 'ENTER'), ...letterRow('zxcvbnm'), actionKey('delete', 'DEL')],
   },
 ];

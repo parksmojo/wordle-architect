@@ -7,6 +7,7 @@
           class="key"
           [class.key--wide]="key.size === 'wide'"
           [style.backgroundColor]="backgroundFor(key)"
+          (click)="handleKeypress(key.id)"
         >
           {{ key.label }}
         </button>
