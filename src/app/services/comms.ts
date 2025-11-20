@@ -11,15 +11,21 @@ export class Comms {
   }
 
   private async share(text: string): Promise<'clipboard' | 'shared'> {
-    if (!navigator.share) {
-      console.log('Copying the text');
-      await navigator.clipboard.writeText(text);
-      return 'clipboard';
+    const canNativeShare = /Mobi|Android/i.test(navigator.userAgent) && !!navigator.share;
+
+    if (canNativeShare) {
+      try {
+        console.log('Sharing the text');
+        await navigator.share({ text });
+        return 'shared';
+      } catch (err) {
+        console.warn('Share failed, copying instead', err);
+      }
     }
 
-    console.log('Sharing the text');
-    await navigator.share({ text });
-    return 'shared';
+    console.log('Copying the text');
+    await navigator.clipboard.writeText(text);
+    return 'clipboard';
   }
 
   shareChallenge(challenge: Challenge): Promise<'clipboard' | 'shared'> {
