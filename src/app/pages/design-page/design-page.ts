@@ -112,14 +112,19 @@ export class DesignPage {
       return;
     }
 
-    const parsed = typeof value === 'number' ? value : parseInt(value, 10);
+    const sanitized = String(value).replace(/\D/g, '');
+    if (!sanitized) {
+      this.guessLimit.set('');
+      return;
+    }
 
+    const parsed = parseInt(sanitized, 10);
     if (Number.isNaN(parsed)) {
       this.guessLimit.set('');
       return;
     }
 
-    const clamped = Math.max(this.MIN_GUESS_LIMIT, Math.min(this.MAX_GUESS_LIMIT, parsed));
+    const clamped = Math.min(this.MAX_GUESS_LIMIT, parsed);
     this.guessLimit.set(String(clamped));
   }
 
