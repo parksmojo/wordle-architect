@@ -1,4 +1,4 @@
-<div class="guess-row">
+<div class="guess-row" [style.--tile-count]="length()">
   @for (tile of tiles(); track $index) {
     <div
       class="tile"

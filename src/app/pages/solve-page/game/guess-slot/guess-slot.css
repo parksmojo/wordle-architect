@@ -1,28 +1,47 @@
 :host {
   display: block;
+  width: 100%;
 }
 
 .guess-row {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
+  --tile-count: 5;
+  --tile-gap: clamp(6px, 1.4vw, 10px);
+  --tile-max-size: clamp(52px, 14vw, 70px);
+  --row-pad: clamp(4px, 2vw, 12px);
+  display: grid;
+  gap: var(--tile-gap);
+  grid-template-columns: repeat(var(--tile-count), minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: calc(
+    var(--tile-count) * var(--tile-max-size) +
+    (var(--tile-count) - 1) * var(--tile-gap) +
+    2 * var(--row-pad)
+  );
+  padding: 0 var(--row-pad);
   width: 100%;
 }
 
 .tile {
   align-items: center;
+  aspect-ratio: 1 / 1;
   background-color: #121213;
   border: 2px solid #3a3a3c;
   color: #f8f8f8;
   display: inline-flex;
-  font-size: 2rem;
+  font-size: clamp(1.05rem, 3.2vw, 2.2rem);
   font-weight: 700;
-  height: 62px;
   justify-content: center;
+  line-height: 1;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  width: 62px;
+  width: 100%;
   transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+@media (max-width: 520px) {
+  .tile {
+    font-size: clamp(1.2rem, 4.8vw, 2rem);
+  }
 }
 
 .tile--filled {
@@ -42,12 +61,4 @@
 .tile--correct {
   background-color: #538d4e;
   border-color: #538d4e;
-}
-
-@media (max-width: 520px) {
-  .tile {
-    font-size: 1.5rem;
-    height: 52px;
-    width: 52px;
-  }
 }

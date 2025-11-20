@@ -6,20 +6,20 @@
 .keyboard {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: clamp(8px, 2vw, 10px);
   margin: 0 auto;
-  padding-bottom: 8px;
+  padding: 0 clamp(6px, 3.5vw, 12px) max(10px, env(safe-area-inset-bottom, 8px));
   width: min(520px, 100%);
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  gap: clamp(3px, 1.2vw, 6px);
 }
 
 .keyboard-row--offset {
-  padding: 0 24px;
+  padding: 0 clamp(0px, 3.5vw, 14px);
 }
 
 .key {
@@ -31,22 +31,23 @@
   color: #fff;
   cursor: pointer;
   display: inline-flex;
-  flex: 0 0 auto;
+  flex: 1 1 0;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: clamp(0.78rem, 2.2vw, 0.95rem);
   font-weight: 700;
-  height: 58px;
+  height: clamp(42px, 11vw, 58px);
   justify-content: center;
-  min-width: 43px;
+  min-width: clamp(20px, 6.8vw, 42px);
   outline: none;
-  padding: 0 12px;
+  padding: 0 clamp(6px, 2vw, 12px);
   text-transform: uppercase;
   transition: transform 0.07s ease, filter 0.07s ease;
   user-select: none;
 }
 
 .key--wide {
-  min-width: 70px;
+  flex: 1.4 1 0;
+  min-width: clamp(32px, 11vw, 64px);
 }
 
 .key:active {

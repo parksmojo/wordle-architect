@@ -6,14 +6,13 @@ import { ActivatedRoute } from '@angular/router';
   providedIn: 'root',
 })
 export class Comms {
-  private share(text: string, isUrl?: boolean) {
+  private share(text: string) {
     if (!navigator.share) {
       console.log('Copying the text');
       navigator.clipboard.writeText(text);
     } else {
       console.log('Sharing the text');
-      const opts = isUrl ? { url: text } : { text };
-      navigator.share(opts);
+      navigator.share({ text });
     }
   }
 
@@ -24,8 +23,8 @@ export class Comms {
     const encodedChallenge = encodeURIComponent(btoa(challengeStr));
     const url = `${window.location.origin}/solve/${encodedChallenge}`;
     console.log('Generated url:', url);
-
-    this.share(url, true);
+    const msg = 'Try this Wordle Challenge I made!\n' + url;
+    this.share(msg);
   }
 
   parseChallenge(route: ActivatedRoute): Challenge | null {
@@ -52,15 +51,10 @@ export class Comms {
     }
     msg.push('\n');
 
+    const map = { g: '🟩', y: '🟨', b: '⬛' };
     for (const row of result) {
       for (const letter of row) {
-        if (letter === 'g') {
-          msg.push('🟩');
-        } else if (letter === 'y') {
-          msg.push('🟨');
-        } else {
-          msg.push('⬛');
-        }
+        msg.push(map[letter as Color]);
       }
       msg.push('\n');
     }
