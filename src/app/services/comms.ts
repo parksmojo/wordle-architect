@@ -10,17 +10,19 @@ export class Comms {
     console.log('version 0.0.1');
   }
 
-  private share(text: string) {
+  private async share(text: string): Promise<'clipboard' | 'shared'> {
     if (!navigator.share) {
       console.log('Copying the text');
-      navigator.clipboard.writeText(text);
-    } else {
-      console.log('Sharing the text');
-      navigator.share({ text });
+      await navigator.clipboard.writeText(text);
+      return 'clipboard';
     }
+
+    console.log('Sharing the text');
+    await navigator.share({ text });
+    return 'shared';
   }
 
-  shareChallenge(challenge: Challenge) {
+  shareChallenge(challenge: Challenge): Promise<'clipboard' | 'shared'> {
     if (!challenge.allowNonsense) delete challenge.allowNonsense;
 
     const challengeStr = JSON.stringify(challenge);
@@ -28,7 +30,7 @@ export class Comms {
     const url = `${window.location.origin}/solve/${encodedChallenge}`;
     console.log('Generated url:', url);
     const msg = 'Try this Wordle Challenge I made!\n' + url;
-    this.share(msg);
+    return this.share(msg);
   }
 
   parseChallenge(route: ActivatedRoute): Challenge | null {
@@ -44,7 +46,7 @@ export class Comms {
     }
   }
 
-  shareResult(won: boolean, result: string[]) {
+  shareResult(won: boolean, result: string[]): Promise<'clipboard' | 'shared'> {
     const msg = [];
     if (!won) {
       msg.push('You got me...');
@@ -63,7 +65,7 @@ export class Comms {
       msg.push('\n');
     }
 
-    this.share(msg.join(''));
+    return this.share(msg.join(''));
   }
 
   validationIsLoading = signal(false);

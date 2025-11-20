@@ -278,6 +278,10 @@
     filter 0.1s ease;
 }
 
+.share-button:not(.share-button--copied):hover {
+  background-color: #5a9957;
+}
+
 .share-button:disabled {
   background-color: #3a3a3c;
   cursor: not-allowed;
@@ -286,6 +290,17 @@
 
 .share-button:not(:disabled):active {
   transform: scale(0.98);
+}
+
+.share-button--copied {
+  background-color: #3a3a3c;
+  color: #d7dadc;
+  cursor: default;
+  filter: none;
+}
+
+.share-button--copied:hover {
+  background-color: #3a3a3c;
 }
 
 .preview__header {

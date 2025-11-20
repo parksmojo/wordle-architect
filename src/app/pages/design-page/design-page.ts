@@ -23,6 +23,7 @@ export class DesignPage {
   wordInput = signal('');
   guessLimit = signal('6');
   allowNonsense = signal(false);
+  shareCopied = signal(false);
 
   wordDebounced = debounced(this.wordInput);
 
@@ -136,7 +137,9 @@ export class DesignPage {
     this.allowNonsense.set(value);
   }
 
-  share = () => {
+  private clipboardResetTimeout: number | null = null;
+
+  share = async () => {
     const guessLimit = parseInt(this.guessLimit(), 10);
     const secretWord = this.wordInput().trim().toLowerCase();
 
@@ -160,12 +163,32 @@ export class DesignPage {
       return;
     }
 
-    this.comms.shareChallenge({
-      word: secretWord,
-      guessLimit,
-      allowNonsense: this.allowNonsense(),
-    });
+    try {
+      const result = await this.comms.shareChallenge({
+        word: secretWord,
+        guessLimit,
+        allowNonsense: this.allowNonsense(),
+      });
+
+      if (result === 'clipboard') {
+        this.flashClipboardNotice();
+      }
+    } catch (error) {
+      console.error('Unable to share challenge', error);
+    }
   };
+
+  private flashClipboardNotice() {
+    if (this.clipboardResetTimeout) {
+      clearTimeout(this.clipboardResetTimeout);
+    }
+
+    this.shareCopied.set(true);
+    this.clipboardResetTimeout = window.setTimeout(() => {
+      this.shareCopied.set(false);
+      this.clipboardResetTimeout = null;
+    }, 1000);
+  }
 
   private placeholderOpts = [
     'crane',

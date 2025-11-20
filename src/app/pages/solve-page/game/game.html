@@ -45,7 +45,7 @@
         </header>
 
         <p class="game-summary__badge" [class.game-summary__badge--lost]="won() === false">
-          {{ won() ? 'Victory' : 'Out of guesses' }}
+          {{ won() ? 'Victory!' : 'Out of guesses!' }}
         </p>
 
         <p class="game-summary__message">
@@ -59,7 +59,14 @@
         }
 
         <p class="game-summary__cta">Show off how you did!</p>
-        <button type="button" class="game-summary__share" (click)="share()">Share</button>
+        <button
+          type="button"
+          class="game-summary__share"
+          [class.game-summary__share--copied]="shareCopied()"
+          (click)="share()"
+        >
+          {{ shareCopied() ? 'Copied to clipboard' : 'Share' }}
+        </button>
       </section>
     }
   </div>

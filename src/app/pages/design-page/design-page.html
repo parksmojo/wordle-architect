@@ -95,8 +95,13 @@
         </div>
       </details>
 
-      <button class="share-button" type="submit" [disabled]="shareDisabled()">
-        Share challenge
+      <button
+        class="share-button"
+        type="submit"
+        [class.share-button--copied]="shareCopied()"
+        [disabled]="shareDisabled()"
+      >
+        {{ shareCopied() ? 'Copied to clipboard' : 'Share challenge' }}
       </button>
     </form>
   </section>

@@ -36,8 +36,10 @@ export class Game {
   guessValidationState = signal<GuessValidationState>('idle');
   invalidGuessAttempted = signal(false);
   autoSubmitPending = signal(false);
+  shareCopied = signal(false);
 
   private validationRequestId = 0;
+  private clipboardResetTimeout: number | null = null;
 
   constructor() {
     effect(() => {
@@ -157,11 +159,32 @@ export class Game {
     return colors;
   }
 
-  share() {
+  share = async () => {
     const guessResults = this.guesses()
       .filter((val) => Array.isArray(val))
       .map(([_, colors]) => colors);
-    this.comms.shareResult(!!this.won(), guessResults);
+
+    try {
+      const result = await this.comms.shareResult(!!this.won(), guessResults);
+
+      if (result === 'clipboard') {
+        this.flashClipboardNotice();
+      }
+    } catch (error) {
+      console.error('Unable to share game result', error);
+    }
+  };
+
+  private flashClipboardNotice() {
+    if (this.clipboardResetTimeout) {
+      clearTimeout(this.clipboardResetTimeout);
+    }
+
+    this.shareCopied.set(true);
+    this.clipboardResetTimeout = window.setTimeout(() => {
+      this.shareCopied.set(false);
+      this.clipboardResetTimeout = null;
+    }, 1000);
   }
 
   private completeGuessSubmission() {
