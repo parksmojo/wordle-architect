@@ -6,6 +6,10 @@ import { ActivatedRoute } from '@angular/router';
   providedIn: 'root',
 })
 export class Comms {
+  constructor() {
+    console.log('version 0.0.1');
+  }
+
   private share(text: string) {
     if (!navigator.share) {
       console.log('Copying the text');
